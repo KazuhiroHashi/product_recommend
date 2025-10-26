@@ -65,9 +65,8 @@ pillow==11.0.0
 posthog==3.7.4
 propcache==0.2.1
 protobuf==5.29.1
-pulsar-client==3.5.0
 pyarrow==18.1.0
-pydantic==1.10.19
+pydantic>=2.7.4,<3.0.0
 pydeck==0.9.1
 Pygments==2.18.0
 python-dateutil==2.9.0.post0
