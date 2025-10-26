@@ -26,7 +26,13 @@ import constants as ct
 # 設定関連
 ############################################################
 load_dotenv()
-
+# Streamlit Cloudでは .env が無視されるため secrets.toml からも読み取る
+openai_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
+if not openai_key:
+    st.error("初期化処理に失敗しました。OpenAI API Key が設定されていません。")
+    st.stop()
+os.environ["OPENAI_API_KEY"] = openai_key
+# -------------------
 
 ############################################################
 # 関数定義
