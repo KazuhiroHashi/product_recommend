@@ -58,9 +58,15 @@ def display_product(result):
     logger = logging.getLogger(ct.LOGGER_NAME)
     st.markdown("以下の商品をご提案いたします。")
 
+    if not result:
+        st.warning("結果が空です。")
+        return
     if isinstance(result, str):
         st.info(result)
         return
+    if isinstance(result, dict):
+        # 念のため dict形式に対応（最小追加）
+        result = [type("Obj", (), {"page_content": "\n".join([f"{k}: {v}" for k, v in result.items()])})()]
 
     try:
         # LLMレスポンスのテキストを辞書に変換
