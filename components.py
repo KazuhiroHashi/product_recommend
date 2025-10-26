@@ -56,35 +56,46 @@ def display_product(result):
         result: LLMからの回答
     """
     logger = logging.getLogger(ct.LOGGER_NAME)
-
-    # LLMレスポンスのテキストを辞書に変換
-    product_lines = result[0].page_content.split("\n")
-    product = {item.split(": ")[0]: item.split(": ")[1] for item in product_lines}
-
     st.markdown("以下の商品をご提案いたします。")
 
-    # 「商品名」と「価格」
-    st.success(f"""
-            商品名：{product['name']}（商品ID: {product['id']}）\n
-            価格：{product['price']}
-    """)
+    if isinstance(result, str):
+        st.info(result)
+        return
 
-    # 「商品カテゴリ」と「メーカー」と「ユーザー評価」
-    st.code(f"""
-        商品カテゴリ：{product['category']}\n
-        メーカー：{product['maker']}\n
-        評価：{product['score']}({product['review_number']}件)
-    """, language=None, wrap_lines=True)
+    try:
+        # LLMレスポンスのテキストを辞書に変換
+        product_lines = result[0].page_content.split("\n")
+        product = {item.split(": ")[0]: item.split(": ")[1] for item in product_lines}
 
-    # 商品画像
-    st.image(f"images/products/{product['file_name']}", width=400)
 
-    # 商品説明
-    st.code(product['description'], language=None, wrap_lines=True)
+        # 「商品名」と「価格」
+        st.success(f"""
+                商品名：{product['name']}（商品ID: {product['id']}）\n
+                価格：{product['price']}
+        """)
 
-    # おすすめ対象ユーザー
-    st.markdown("**こんな方におすすめ！**")
-    st.info(product["recommended_people"])
+        # 「商品カテゴリ」と「メーカー」と「ユーザー評価」
+        st.code(f"""
+            商品カテゴリ：{product['category']}\n
+            メーカー：{product['maker']}\n
+            評価：{product['score']}({product['review_number']}件)
+        """, language=None, wrap_lines=True)
 
-    # 商品ページのリンク
-    st.link_button("商品ページを開く", type="primary", use_container_width=True, url="https://google.com")
+        # 商品画像
+        image_path = f"images/products/{product.get('file_name', 'default.jpg')}"
+        st.image(image_path, width=400)
+
+        # 商品説明
+        st.code(product['description'], language=None, wrap_lines=True)
+
+        # おすすめ対象ユーザー
+        st.markdown("**こんな方におすすめ！**")
+        st.info(product["recommended_people"])
+
+        # 商品ページのリンク
+        st.link_button("商品ページを開く", type="primary", use_container_width=True, url="https://google.com")
+
+    except Exception as e:
+        logger.error(f"Error occurred while processing LLM response: {e}")
+        st.error(ct.LLM_RESPONSE_DISP_ERROR_MESSAGE)
+        return
